@@ -1,5 +1,7 @@
 FROM ruby:2.5.1
 
+LABEL mainter "bcolfer@zendesk.com"
+
 RUN mkdir /app
 WORKDIR /app
 
