@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-xlr-deployment
+  labels:
+    app: hello-xlr
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-xlr
+  template:
+    metadata:
+      labels:
+        app: hello-xlr
+    spec:
+      containers:
+      - name: hello-xlr
+        image: gcr.io://docker-image-builder-179319/apps/hello-xlr:latest
+        ports:
+          - name: hello-xlr
+            containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-xlr
+  namespace: samson-staging
+  labels:
+    app: hello-xlr
+spec:
+  selector:
+    app: hello-xlr
+  ports:
+    - name: http
+      port: 8080
+      targetPort: hello-xlr

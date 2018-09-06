@@ -1,2 +1,6 @@
-# hello-xlr
-Hello XL-Release
+# bcolfer-hello
+An experimental hello application
+
+With multiple endpoints
+
+Deploys to kubernetes
