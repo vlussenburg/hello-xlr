@@ -1,6 +1,2 @@
 # Hello XLR
-An experimental hello application
-
-With multiple endpoints
-
-Deploys to kubernetes
+An experimental hello application with multiple endpoints and that deploys to kubernetes.
