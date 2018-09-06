@@ -1,4 +1,4 @@
-# hello-xlr
+# Hello XLR
 An experimental hello application
 
 With multiple endpoints
