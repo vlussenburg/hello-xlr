@@ -1,1 +1,89 @@
-R
+// Exported from:        http://www.zd-mini.com/#/templates/Folderb69ec5f2a4fa4088992d931e3d3211a6-Releasee86fc108f80645f3912b7b4e4ea35415/releasefile
+// XL Release version:   8.1.0
+// Date created:         Fri Sep 07 18:28:55 UTC 2018
+
+def server(type, title, folderPath = null) {
+    def folderId = null
+    if(folderPath) {
+          folderId = folderApi.find(folderPath, 0).getId()
+    }
+    def cis = configurationApi.searchByTypeAndTitle(type, title, folderId)
+    if (cis.isEmpty()) {
+        throw new RuntimeException("No CI found for the type '${type}' and title '${title}'")
+    }
+    if (cis.size() > 1) {
+        throw new RuntimeException("More than one CI found for the type '${type}' and title '${title}'")
+    }
+    cis.get(0)
+}
+
+def jenkinsServer1 = server('jenkins.Server','Jenkins - POC 2')
+def jenkinsServer2 = server('jenkins.Server','Jenkins - POC 2')
+def server1 = server('github.Server','GitHub public')
+
+xlr {
+  template('hello-xlr') {
+    folder('zendesk')
+    description 'XebiaLabs specific demo project'
+    scheduledStartDate Date.parse("yyyy-MM-dd'T'HH:mm:ssZ", '2018-09-06T16:00:00+0000')
+    phases {
+      phase('Build Images') {
+        color '#0099CC'
+        tasks {
+          custom('Jenkins call to GCB') {
+            script {
+              type 'jenkins.Build'
+              jenkinsServer jenkinsServer1
+              jobName 'build-hello-xlr'
+              jobParameters 'BRANCH_NAME=master'
+            }
+          }
+        }
+      }
+      phase('Deploy to staging') {
+        color '#0099CC'
+        tasks {
+          script('Verify staging deployment can be done [replace with xlr-delivery-plugin]') {
+            description 'Verifies that staging is currently green and no other deployments are running'
+            script 'return True'
+          }
+          manual('Replace this with a Samson Deploy after plugin is installed') {
+            
+          }
+          custom('Run automated tests') {
+            script {
+              type 'jenkins.Build'
+              jenkinsServer jenkinsServer2
+            }
+          }
+        }
+      }
+      phase('Deploy to production') {
+        color '#0099CC'
+        tasks {
+          script('Verify production deployment can be done [replace with xlr-delivery-plugin]') {
+            script 'return True'
+          }
+          manual('Perform a deploy in Samson [manually]') {
+            description '1. Go to [Samson](http://samson.zd-mini.com/projects/hello-xlr)\n' +
+                        '1. Execute deploy\n' +
+                        '1. Wait for buddy to approve\n' +
+                        '1. ????\n' +
+                        '1. Profit (and complete this task)!'
+            owner 'admin'
+          }
+        }
+      }
+    }
+    releaseTriggers {
+      githubCommitTrigger('hello-xlr') {
+        releaseTitle 'hello-xlr-${commitId}-${release.id}'
+        tags '${commitId}', 'hello-xlr'
+        server server1
+        organization 'zendesk'
+        repositoryName 'hello-xlr'
+      }
+    }
+    
+  }
+}
